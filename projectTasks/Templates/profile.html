@@ -1,0 +1,91 @@
+
+{% extends 'header.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    :root {
+        --bg-dark: #0a2540;
+        --accent-purple: #635bff;
+        --deep-gradient: linear-gradient(135deg, #0a2540 0%, #32325d 40%, #635bff 100%);
+        --success-green: #00ffcc;
+        text-align : left;
+    }
+
+    body { background: var(--bg-dark); color: white; direction: rtl;direction: ltr;
+        text-align: left; }
+
+    .mesh-background {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: var(--deep-gradient); z-index: -1;
+    }
+
+    .auth-card {
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 2.5rem;
+        max-width: 500px;
+        margin: 4rem auto;
+    }
+
+    .custom-select {
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: rgba(10, 37, 64, 0.5);
+        color: white;
+        margin-bottom: 20px;
+        font-size: 1rem;
+        appearance: none;
+    }
+
+    .custom-select option { background: var(--bg-dark); color: white; }
+
+    .btn-submit {
+        background: var(--accent-purple);
+        color: white; border: none; padding: 16px;
+        border-radius: 14px; font-weight: 700; width: 100%;
+        cursor: pointer; font-size: 1.1rem; transition: 0.3s;
+    }
+
+    .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(99, 91, 255, 0.4); }
+
+    .hero-subtitle { color: rgba(255, 255, 255, 0.6); font-size: 1.1rem; }
+</style>
+
+<div class="mesh-background"></div>
+
+<div class="container">
+    <div class="auth-card">
+        <h2 class="fw-bold mb-2 text-end"> Setting up a personal area</h2>
+        <p class="hero-subtitle text-end mb-4">Hi {{ user.username }}, Define your team and role in the system</p>
+
+        <form method="post" autocomplete="off">
+            {% csrf_token %}
+            <label class="form-label text-end d-block"> Field of Expertise</label>
+            <select name="staff_type" class="custom-select" required>
+             {% for value, label in staff_choices %}
+              <option value="{{ value }}"
+            {% if not person.nameStaff and value == "" %} selected {% elif person.nameStaff == value %} selected {% endif %}>
+            {{ label }}
+             </option>
+    {% endfor %}
+</select>
+
+
+
+
+            <label class="form-label text-end d-block"> User Role </label>
+            <select name="role" class="custom-select">
+              <option value="wo" {% if person.role == 'wo' %}selected{% endif %}>Worker</option>
+              <option value="ma" {% if person.role == 'ma' %}selected{% endif %}>Manager</option>
+            </select>
+
+            <button type="submit" class="btn-submit mt-3">Save and Continue  </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

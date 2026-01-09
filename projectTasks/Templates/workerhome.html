@@ -1,0 +1,221 @@
+{% extends 'header.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<style>
+    :root {
+        --bg-dark: #0a2540;
+        --accent-purple: #635bff;
+        --deep-gradient: linear-gradient(135deg, #0a2540 0%, #32325d 40%, #635bff 100%);
+        --glass-white: rgba(255, 255, 255, 0.08);
+        --success-green: #00ffcc;
+        --warning-yellow: #ffc107;
+        --info-blue: #00d4ff;
+    }
+
+    body {
+        background: var(--bg-dark);
+        color: white;
+        /* Changed to Left-to-Right */
+        direction: ltr;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .mesh-background {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: var(--deep-gradient); z-index: -1;
+    }
+
+    /* Logout wrapper moved to the right for LTR */
+    .logout-wrapper {
+        position: fixed;
+        top: 25px;
+        right: 25px;
+        z-index: 1050;
+    }
+
+    .btn-logout-modern {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 18px;
+        background: rgba(255, 75, 92, 0.1);
+        border: 1px solid rgba(255, 75, 92, 0.2);
+        backdrop-filter: blur(12px);
+        border-radius: 14px;
+        color: #ff4b5c;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+    }
+
+    .btn-logout-modern:hover {
+        background: #ff4b5c;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255, 75, 92, 0.3);
+    }
+
+    .worker-container {
+        padding-top: 5rem;
+        padding-bottom: 5rem;
+    }
+
+    .filter-bar {
+        background: rgba(255, 255, 255, 0.03);
+        padding: 15px 20px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+    }
+
+    .btn-filter-custom {
+        border-radius: 10px !important;
+        margin: 0 4px;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: rgba(255, 255, 255, 0.7) !important;
+        font-size: 0.85rem;
+        transition: 0.3s all ease;
+    }
+
+    .btn-all.active { background: rgba(255, 255, 255, 0.15) !important; color: white !important; border-color: white !important; }
+    .btn-new.active { background: rgba(0, 212, 255, 0.2) !important; color: var(--info-blue) !important; border-color: var(--info-blue) !important; box-shadow: 0 0 15px rgba(0, 212, 255, 0.2); }
+    .btn-ip.active { background: rgba(255, 193, 7, 0.2) !important; color: var(--warning-yellow) !important; border-color: var(--warning-yellow) !important; box-shadow: 0 0 15px rgba(255, 193, 7, 0.2); }
+    .btn-my.active { background: rgba(99, 91, 255, 0.2) !important; color: #a39eff !important; border-color: var(--accent-purple) !important; box-shadow: 0 0 15px rgba(99, 91, 255, 0.3); }
+    .btn-co.active { background: rgba(0, 255, 204, 0.2) !important; color: var(--success-green) !important; border-color: var(--success-green) !important; box-shadow: 0 0 15px rgba(0, 255, 204, 0.2); }
+
+    .task-card {
+        background: var(--glass-white);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: 0.3s;
+    }
+
+    .task-info h4 { color: var(--success-green); margin-bottom: 0.5rem; font-weight: 700; }
+
+    .task-badge-box {
+        padding: 12px 20px;
+        border-radius: 14px;
+        font-weight: 600;
+        min-width: 190px;
+        min-height: 70px;
+        text-align: center;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: 0.3s;
+        text-decoration: none;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .btn-badge-claim { background: rgba(99, 91, 255, 0.1) !important; border: 1px solid var(--accent-purple) !important; color: white !important; }
+    .btn-badge-complete { background: rgba(0, 255, 204, 0.1) !important; border: 1px solid var(--success-green) !important; color: var(--success-green) !important; }
+    .badge-others-box { background: rgba(255, 193, 7, 0.08) !important; border: 1px solid var(--warning-yellow) !important; color: var(--warning-yellow) !important; }
+    .badge-completed-box { background: rgba(0, 255, 204, 0.05) !important; border: 1px solid rgba(0, 255, 204, 0.4) !important; color: var(--success-green) !important; }
+
+    .status-badge { background: rgba(255, 255, 255, 0.1); padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; }
+    .executor-tag { font-size: 0.85rem; background: rgba(255, 255, 255, 0.1); padding: 4px 12px; border-radius: 20px; display: inline-flex; align-items: center; margin-bottom: 10px; }
+    .form-control-custom { background: rgba(10, 37, 64, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); color: white; border-radius: 10px; }
+</style>
+
+<div class="mesh-background"></div>
+
+<div class="logout-wrapper">
+    <a href="{% url 'logout' %}" class="btn-logout-modern">
+        <span>Logout</span>
+        <i class="bi bi-box-arrow-right"></i>
+    </a>
+</div>
+
+<div class="container worker-container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <div class="welcome-header text-center mb-4">
+                <h1 class="fw-bold">My Task Board</h1>
+                <p class="text-white-50">Team: {{ request.user.person.get_nameStaff_display }}</p>
+            </div>
+
+            <div class="filter-bar d-flex flex-wrap gap-2 mb-5 align-items-center justify-content-center">
+                <span class="opacity-50 small me-2"><i class="bi bi-filter"></i> Filter:</span>
+                <div class="btn-group shadow-none">
+                    <a href="?status=" class="btn btn-filter-custom btn-all {% if not current_status %}active{% endif %}">All</a>
+                    <a href="?status=nw" class="btn btn-filter-custom btn-new {% if current_status == 'nw' %}active{% endif %}">Available</a>
+                    <a href="?status=ip" class="btn btn-filter-custom btn-ip {% if current_status == 'ip' %}active{% endif %}">In Progress</a>
+                    <a href="?status=my" class="btn btn-filter-custom btn-my {% if current_status == 'my' %}active{% endif %}">My Tasks</a>
+                    <a href="?status=co" class="btn btn-filter-custom btn-co {% if current_status == 'co' %}active{% endif %}">Completed</a>
+                </div>
+                <div class="vr mx-2 opacity-25 d-none d-md-block" style="height: 30px;"></div>
+                <select onchange="location = this.value;" class="form-control-custom py-1 px-2" style="width: auto; font-size: 0.85rem; height: 35px; min-width: 160px;">
+                    <option value="?worker="">👥 All Members</option>
+                    {% for worker in team_workers %}
+                        <option value="?worker={{ worker.id }}" {% if current_worker == worker.id|stringformat:"i" %}selected{% endif %}>👤 {{ worker.user.username }}</option>
+                    {% endfor %}
+                </select>
+                <a href="?" class="text-white-50 small text-decoration-none ms-md-auto px-2"><i class="bi bi-arrow-counterclockwise"></i> Reset</a>
+            </div>
+
+            <div id="tasks-list">
+                {% for task in tasks %}
+                    <div class="task-card">
+                        <div class="task-info">
+                            <div class="d-flex align-items-center mb-2">
+                                <h4 class="mb-0 me-3">{{ task.name }}</h4>
+                                <span class="status-badge">{{ task.get_status_display }}</span>
+                            </div>
+                            {% if task.executor %}
+                            <div class="executor-tag"><i class="bi bi-person-circle me-2"></i> Assigned to: <strong class="ms-1">{{ task.executor.user.username }}</strong></div>
+                            {% endif %}
+                            <p class="mb-2 text-white-700">{{ task.description }}</p>
+                            <div class="task-meta text-white-50 small"><span><i class="bi bi-calendar"></i> Due: {{ task.end_date|date:"d/m/Y" }}</span></div>
+                        </div>
+
+                        <div class="task-action">
+                            {% if not task.executor %}
+                                <form method="POST" action="{% url 'claim_task' task.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="task-badge-box btn-badge-claim">
+                                        <span class="d-block"><i class="bi bi-plus-circle"></i> Available to Claim</span>
+                                        <small>Click to Assign +</small>
+                                    </button>
+                                </form>
+                            {% elif task.executor == request.user.person and task.status != 'co' %}
+                                <form method="POST" action="{% url 'complete_task' task.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="task-badge-box btn-badge-complete">
+                                        <span class="d-block"><i class="bi bi-check2-circle"></i> Your Active Task</span>
+                                        <small>Mark as Done ✓</small>
+                                    </button>
+                                </form>
+                            {% elif task.status == 'co' %}
+                                <div class="task-badge-box badge-completed-box">
+                                    <span class="d-block"><i class="bi bi-patch-check-fill"></i> Completed</span>
+                                    <small>Done by {{ task.executor.user.username }}</small>
+                                </div>
+                            {% else %}
+                                <div class="task-badge-box badge-others-box">
+                                    <span class="d-block"><i class="bi bi-lock-fill"></i> In Progress by:</span>
+                                    <span class="fw-bold">{{ task.executor.user.username }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-5"><p class="text-white-50">No matching tasks found.</p></div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

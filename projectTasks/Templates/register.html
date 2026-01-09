@@ -1,0 +1,207 @@
+{% extends 'header.html' %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<style>
+    :root {
+        --bg-dark: #0a2540;
+        --accent-purple: #635bff;
+        --deep-gradient: linear-gradient(135deg, #0a2540 0%, #32325d 40%, #635bff 100%);
+        --error-red: #ff4d4d;
+        --success-green: #00ffcc;
+    }
+
+    body {
+        background: var(--bg-dark);
+        min-height: 100vh;
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .mesh-background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: var(--deep-gradient);
+        z-index: -1;
+    }
+
+    .auth-card {
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 24px;
+        padding: 2.5rem;
+        max-width: 450px;
+        margin: 2rem auto;
+        color: white;
+    }
+
+    .form-label {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .required-dot {
+        color: var(--error-red);
+        margin-right: 4px;
+    }
+
+    .custom-input {
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+        margin-bottom: 5px;
+        font-size: 1rem;
+        transition: 0.3s;
+    }
+
+    .custom-input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--accent-purple);
+        box-shadow: 0 0 10px rgba(99, 91, 255, 0.3);
+        text-align:left;
+    }
+
+    .error-feedback {
+        color: var(--error-red);
+        font-size: 0.8rem;
+        margin-bottom: 15px;
+        display: none;
+        text-align: right;
+    }
+
+    .btn-submit {
+        background: var(--accent-purple);
+        color: white;
+        border: none;
+        padding: 16px;
+        border-radius: 14px;
+        font-weight: 700;
+        width: 100%;
+        cursor: pointer;
+        font-size: 1.1rem;
+        margin-top: 10px;
+        transition: 0.3s;
+    }
+
+    .register-link {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
+    .register-link span {
+        color: var(--success-green);
+        font-weight: 600;
+    }
+
+    .val-list { list-style: none; padding: 0; margin: 10px 0 20px 0; font-size: 0.85rem; text-align: right; }
+    .val-item { color: rgba(255, 255, 255, 0.4); transition: 0.3s; }
+    .val-item.valid { color: var(--success-green); font-weight: bold; }
+    .val-item.valid::before { content: "✓ "; margin-left: 5px; }
+    .pass-container { position: relative; width: 100%; }
+    .toggle-password { position: absolute; right: 15px; top: 14px; cursor: pointer; color: rgba(255, 255, 255, 0.6); z-index: 10; }
+    .custom-input-pass { padding-right: 45px !important; }
+    .hero-title { font-size: 3.5rem; font-weight: 800; background: linear-gradient(to left, #ffffff, #adbdcc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+</style>
+
+<div class="mesh-background"></div>
+
+<div class="container py-5">
+    <div class="row align-items-center min-vh-100 flex-row-reverse text-end">
+        <div class="col-lg-7 d-none d-lg-block">
+            <h1 class="hero-title">One Platform,<br>Total Control...  </h1>
+        </div>
+
+        <div class="col-lg-5 text-start">
+            <div class="auth-card">
+                <h2 class="fw-bold mb-4 text-end">Register</h2>
+                <form method="post" id="registerForm" >
+                    {% csrf_token %}
+
+                    <label class="form-label"> Username <span class="required-dot">*</span></label>
+                    <input type="text" name="username" id="username" class="custom-input" placeholder="User123" autocomplete="one-time-code" required><!--                    <div class="error-feedback" id="username-error">Please choose a username (at least 3 characters)</div>-->
+
+                    <label class="form-label"> Full Name <span class="required-dot">*</span></label>
+                    <input type="text" name="full_name" id="full_name" class="custom-input" placeholder="Israel Israeli" autocomplete="name" required>
+<!--                    <div class="error-feedback" id="full_name-error">Please enter your full name (first and last name)</div>-->
+
+                    <label class="form-label">Email <span class="required-dot">*</span></label>
+                    <input type="email" name="email" id="email" class="custom-input" placeholder="name@example.com" autocomplete="email" required>
+<!--                    <div class="error-feedback" id="email-error">Invalid email address</div>-->
+
+                    <label class="form-label">Password<span class="required-dot">*</span></label>
+                    <div class="pass-container">
+                        <input type="password" id="pw" name="password" class="custom-input custom-input-pass" placeholder="********" autocomplete="new-password" required>
+                        <i class="bi bi-eye-slash toggle-password" id="eyeIcon"></i>
+                    </div>
+
+    <ul class="val-list" style="text-align: left;">
+    <li id="len" class="val-item"> At least 8 characters</li>
+    <li id="num" class="val-item"> At least one number</li>
+    <li id="upper" class="val-item"> One uppercase letter (A-Z)</li>
+    <li id="lower" class="val-item"> One lowercase letter (a-z)</li>
+    </ul>
+
+<button type="submit" id="submitBtn" class="btn-submit shadow">Create Account</button>
+
+<a href="/login/" class="register-link">Already have an account? <span>Login</span></a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const passwordInput = document.getElementById('pw');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    const requirements = {
+        len: document.getElementById('len'),
+        num: document.getElementById('num'),
+        upper: document.getElementById('upper'),
+        lower: document.getElementById('lower')
+    };
+
+    passwordInput.addEventListener('input', () => {
+        const value = passwordInput.value;
+
+        validate(requirements.len, value.length >= 8);
+
+        validate(requirements.num, /[0-9]/.test(value));
+
+        validate(requirements.upper, /[A-Z]/.test(value));
+
+        validate(requirements.lower, /[a-z]/.test(value));
+    });
+
+    function validate(element, isValid) {
+        if (isValid) {
+            element.classList.add('valid');
+        } else {
+            element.classList.remove('valid');
+        }
+    }
+
+    eyeIcon.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        eyeIcon.classList.toggle('bi-eye');
+        eyeIcon.classList.toggle('bi-eye-slash');
+    });
+</script>
+{% endblock %}
