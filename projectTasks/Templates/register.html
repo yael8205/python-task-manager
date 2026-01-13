@@ -130,19 +130,28 @@
         <div class="col-lg-5 text-start">
             <div class="auth-card">
                 <h2 class="fw-bold mb-4 text-end">Register</h2>
+       {% if messages %}
+        <div class="messages-container mb-3 text-end">
+            {% for message in messages %}
+                <div class="alert alert-danger bg-opacity-25 border-0 text-white shadow-sm"
+                     style="background: rgba(255, 77, 77, 0.2); border-radius: 12px; padding: 12px; font-size: 0.9rem;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+       {% endif %}
                 <form method="post" id="registerForm" >
                     {% csrf_token %}
 
                     <label class="form-label"> Username <span class="required-dot">*</span></label>
                     <input type="text" name="username" id="username" class="custom-input" placeholder="User123" autocomplete="one-time-code" required><!--                    <div class="error-feedback" id="username-error">Please choose a username (at least 3 characters)</div>-->
 
-                    <label class="form-label"> Full Name <span class="required-dot">*</span></label>
+                    <label class="form-label">  Name <span class="required-dot">*</span></label>
                     <input type="text" name="full_name" id="full_name" class="custom-input" placeholder="Israel Israeli" autocomplete="name" required>
-<!--                    <div class="error-feedback" id="full_name-error">Please enter your full name (first and last name)</div>-->
 
                     <label class="form-label">Email <span class="required-dot">*</span></label>
                     <input type="email" name="email" id="email" class="custom-input" placeholder="name@example.com" autocomplete="email" required>
-<!--                    <div class="error-feedback" id="email-error">Invalid email address</div>-->
 
                     <label class="form-label">Password<span class="required-dot">*</span></label>
                     <div class="pass-container">

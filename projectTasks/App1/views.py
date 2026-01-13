@@ -6,7 +6,6 @@ from django.contrib import messages
 from datetime import datetime
 from App1.models import Person, Task
 from django.contrib.auth import logout
-from django.contrib.messages import get_messages
 
 def register_view(request):
     if request.method == 'POST':
@@ -32,7 +31,6 @@ def register_view(request):
             user.save()
             Person.objects.create(user=user)
             login(request, user)
-            messages.success(request, 'נרשמת בהצלחה! כעת הגדר את התפקיד שלך.')
             return redirect('profile_setup')
         except Exception as e:
             messages.error(request, 'An error occurred during the registration process')
@@ -41,8 +39,6 @@ def register_view(request):
 
 
 def login_view(request):
-
-
     if request.method == "POST":
         u = request.POST.get('username')
         p = request.POST.get('password')
@@ -52,12 +48,6 @@ def login_view(request):
             login(request, user)
             person, created = Person.objects.get_or_create(user=user)
 
-
-            messages.success(request, f"Welcome back, {user.first_name if user.first_name else user.username}!")
-
-            next_url = request.GET.get('next')
-            if next_url:
-                return redirect(next_url)
             if person.role == 'ma':
                 return redirect('managerhome')
             return redirect('workerhome')
@@ -77,16 +67,13 @@ def profile_setup(request):
         staff_type = request.POST.get('staff_type')
         role = request.POST.get('role')
 
-        if not staff_type or staff_type == "":
-            messages.error(request, "Please select a field of expertise")
-        else:
-            person.nameStaff = staff_type
-            person.role = role
-            person.save()
 
-            if person.role == 'ma':
-                return redirect('managerhome')
-            return redirect('workerhome')
+        person.nameStaff = staff_type
+        person.role = role
+        person.save()
+        if person.role == 'ma':
+            return redirect('managerhome')
+        return redirect('workerhome')
 
     staff_choices = [('', '---  Select Specialization ---')] + list(Person.StaffType.choices)
     context = {
@@ -95,7 +82,6 @@ def profile_setup(request):
         'role_choices': Person.UserRole.choices,
     }
     return render(request, 'profile.html', context)
-
 
 @login_required
 def workerhome(request):
@@ -131,9 +117,6 @@ def delete_task(request, task_id):
     task = get_object_or_404(Task, id=task_id)
     if not task.executor:
         task.delete()
-        messages.success(request, "The task is deleted")
-    else:
-        messages.error(request, "Cannot delete a task that is in progress")
     return redirect('managerhome')
 
 @login_required
@@ -145,10 +128,6 @@ def claim_task(request, task_id):
         task.executor = person
         task.status = 'ip'
         task.save()
-        messages.success(request, "The task has been successfully assigned to you!")
-    else:
-        messages.error(request, "This task cannot be assigned.")
-
     return redirect('workerhome')
 
 
@@ -158,10 +137,6 @@ def complete_task(request, task_id):
     if task.executor == request.user.person:
         task.status = 'co'
         task.save()
-        messages.success(request, f"Task '{task.name}' has been marked as completed!")
-    else:
-        messages.error(request, "You are not authorized to mark this task as completed.")
-
     return redirect('workerhome')
 
 
@@ -212,7 +187,6 @@ def add_task(request):
                 new_task.status = 'ip'
                 new_task.save()
 
-            messages.success(request, "Task added and assigned successfully!")
     return redirect('managerhome')
 
 
@@ -222,9 +196,6 @@ def edit_task(request, task_id):
     if request.method == 'POST' and not task.executor:
         task.name = request.POST.get('name')
         task.description = request.POST.get('description')
-        task.end_date = request.POST.get('end_date') # עדכון התאריך
+        task.end_date = request.POST.get('end_date')
         task.save()
-        messages.success(request, "Task updated successfully!")
-    else:
-        messages.error(request, "Tasks in progress cannot be edited.")
     return redirect('managerhome')

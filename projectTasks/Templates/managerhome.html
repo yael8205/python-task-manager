@@ -279,4 +279,14 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const today = new Date().toISOString().split("T")[0];
+
+         const allDateInputs = document.querySelectorAll('input[type="date"]');
+        allDateInputs.forEach(function(input) {
+            input.min = today;
+        });
+    });
+</script>
 {% endblock %}
